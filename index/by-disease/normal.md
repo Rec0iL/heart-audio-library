@@ -1,0 +1,11 @@
+# Normal — Heart Sound Recordings (7)
+
+| Recording | Animal | Diagnosis | Grade | Breed | Source | Audio | Image | Duration |
+|---|---|---|---|---|---|---|---|---|
+| tiho-normal-rhythm | dog | Normal cardiac rhythm (no murmur) | 0/6 | Beagle | tiho-hannover | [normal_cardiac_rhythm.mp3](../../sources/tiho-hannover/audio/examples/normal_cardiac_rhythm.mp3) |  | 19.5s |
+| tiho-normal-rhythm-video | dog | Normal cardiac rhythm (video/DPCG) | 0/6 | Beagle | tiho-hannover | [normal_cardiac_rhythm.mpg](../../sources/tiho-hannover/audio/examples/normal_cardiac_rhythm.mpg) |  |  |
+| uq-eq-normal-aortic | horse | Normal heart sounds (aortic valve) |  | unspecified | uq-equine-auscultation | [aortic_valve_normal.wav](../../sources/uq-equine-auscultation/audio/normal/aortic_valve_normal.wav) | [phonogram](../../sources/uq-equine-auscultation/images/normal/aortic_valve_normal_phonogram.png) | 15.0s |
+| uq-eq-normal-mitral | horse | Normal heart sounds (mitral valve) |  | unspecified | uq-equine-auscultation | [mitral_valve_normal.wav](../../sources/uq-equine-auscultation/audio/normal/mitral_valve_normal.wav) | [phonogram](../../sources/uq-equine-auscultation/images/normal/mitral_valve_normal_phonogram.png) | 15.0s |
+| uq-eq-normal-s3-gallop | horse | Physiologic S3 gallop sound (mitral valve) |  | unspecified | uq-equine-auscultation | [mitral_valve_s3_gallop.wav](../../sources/uq-equine-auscultation/audio/normal/mitral_valve_s3_gallop.wav) | [phonogram](../../sources/uq-equine-auscultation/images/normal/mitral_valve_s3_gallop_phonogram.png) | 15.0s |
+| uq-eq-normal-tricuspid | horse | Normal heart sounds (tricuspid valve) |  | unspecified | uq-equine-auscultation | [tricuspid_valve_normal.wav](../../sources/uq-equine-auscultation/audio/normal/tricuspid_valve_normal.wav) | [phonogram](../../sources/uq-equine-auscultation/images/normal/tricuspid_valve_normal_phonogram.png) | 15.0s |
+| uq-eq-normal-tricuspid-realistic | horse | Normal heart sounds (tricuspid valve, realistic field recording) |  | unspecified | uq-equine-auscultation | [tricuspid_valve_realistic_with_git_sounds.wav](../../sources/uq-equine-auscultation/audio/normal/tricuspid_valve_realistic_with_git_sounds.wav) | [phonogram](../../sources/uq-equine-auscultation/images/normal/tricuspid_valve_realistic_with_git_sounds_phonogram.png) | 15.0s |

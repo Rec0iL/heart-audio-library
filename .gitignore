@@ -1,0 +1,5 @@
+# Build output duplicate (identical content to index.html, minus the doctype wrapper) — regenerate with scripts/build_player.py
+scripts/build/
+
+# Original downloaded archives kept locally for provenance, not tracked (large, re-fetchable — see each source's ATTRIBUTION.md)
+sources/*/raw/

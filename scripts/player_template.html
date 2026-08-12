@@ -1,0 +1,1458 @@
+<title>Stethoscape</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A listening atlas of animal heart sounds — auscultate, compare, and test yourself across species and cardiac diagnoses.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A9%BA%3C/text%3E%3C/svg%3E">
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("stethoscape-theme");
+      if (saved === "light" || saved === "dark") {
+        document.documentElement.dataset.theme = saved;
+      }
+    } catch (e) {}
+  })();
+</script>
+<style>
+  @font-face {
+    font-family: "Fraunces";
+    src: url("__FONT_FRAUNCES__") format("woff2");
+    font-weight: 300 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "IBM Plex Sans";
+    src: url("__FONT_PLEX_SANS__") format("woff2");
+    font-weight: 300 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "IBM Plex Mono";
+    src: url("__FONT_PLEX_MONO_400__") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "IBM Plex Mono";
+    src: url("__FONT_PLEX_MONO_500__") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --paper: #eef0e7;
+    --surface: #ffffff;
+    --surface-2: #f7f8f1;
+    --ink: #1b2420;
+    --ink-soft: #55625a;
+    --ink-faint: #8b958e;
+    --line: #d8dbce;
+    --accent: #146b69;
+    --accent-strong: #0e4f4d;
+    --accent-soft: rgba(20, 107, 105, 0.12);
+    --line-red: #b23b33;
+    --line-red-soft: rgba(178, 59, 51, 0.14);
+    --good: #2e7d4f;
+    --good-soft: rgba(46, 125, 79, 0.14);
+    --bad: #b23b33;
+    --bad-soft: rgba(178, 59, 51, 0.12);
+    --cat-normal: #146b69;
+    --cat-congenital: #93701f;
+    --cat-acquired: #a5552e;
+    --cat-arrhythmia: #7a2e3a;
+    --shadow: 0 1px 2px rgba(27, 36, 32, 0.07), 0 10px 28px rgba(27, 36, 32, 0.07);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font-display: "Fraunces", ui-serif, Georgia, serif;
+    --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0e1512;
+      --surface: #172420;
+      --surface-2: #1c2a25;
+      --ink: #e9efe9;
+      --ink-soft: #a9b7af;
+      --ink-faint: #6e7c74;
+      --line: #253530;
+      --accent: #4fd9c7;
+      --accent-strong: #8bf0e2;
+      --accent-soft: rgba(79, 217, 199, 0.14);
+      --line-red: #e2685c;
+      --line-red-soft: rgba(226, 104, 92, 0.16);
+      --good: #5cc98a;
+      --good-soft: rgba(92, 201, 138, 0.16);
+      --bad: #e2685c;
+      --bad-soft: rgba(226, 104, 92, 0.16);
+      --cat-normal: #4fd9c7;
+      --cat-congenital: #dcae52;
+      --cat-acquired: #dd8459;
+      --cat-arrhythmia: #cf8695;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 14px 34px rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0e1512;
+    --surface: #172420;
+    --surface-2: #1c2a25;
+    --ink: #e9efe9;
+    --ink-soft: #a9b7af;
+    --ink-faint: #6e7c74;
+    --line: #253530;
+    --accent: #4fd9c7;
+    --accent-strong: #8bf0e2;
+    --accent-soft: rgba(79, 217, 199, 0.14);
+    --line-red: #e2685c;
+    --line-red-soft: rgba(226, 104, 92, 0.16);
+    --good: #5cc98a;
+    --good-soft: rgba(92, 201, 138, 0.16);
+    --bad: #e2685c;
+    --bad-soft: rgba(226, 104, 92, 0.16);
+    --cat-normal: #4fd9c7;
+    --cat-congenital: #dcae52;
+    --cat-acquired: #dd8459;
+    --cat-arrhythmia: #cf8695;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 14px 34px rgba(0, 0, 0, 0.4);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+  img { max-width: 100%; display: block; }
+  button { font: inherit; }
+  a { color: var(--accent-strong); }
+
+  .wrap {
+    max-width: 74rem;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  /* ---------- header ---------- */
+  header.top {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 0;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.15rem, 1rem + 0.6vw, 1.5rem);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .brand small {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+  .top-actions { display: flex; align-items: center; gap: 0.5rem; }
+
+  .theme-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-soft);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .theme-btn:hover { color: var(--accent-strong); border-color: var(--accent); }
+  .theme-btn svg { width: 1.05rem; height: 1.05rem; }
+
+  .tabs {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.25rem;
+  }
+  .tab {
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .tab[aria-selected="true"] {
+    background: var(--accent);
+    color: var(--surface);
+  }
+  .tab:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- hero ---------- */
+  .hero {
+    padding: clamp(1.75rem, 1.2rem + 2vw, 3.25rem) 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 2.5rem;
+    align-items: center;
+  }
+  @media (max-width: 800px) {
+    .hero { grid-template-columns: 1fr; gap: 1.5rem; }
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 1.5rem + 2.2vw, 3.1rem);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.75rem;
+    text-wrap: balance;
+  }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent-strong);
+  }
+  .hero p.lede {
+    font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.08rem);
+    color: var(--ink-soft);
+    max-width: 42ch;
+    margin: 0 0 1.25rem;
+  }
+  .stat-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .stat { display: flex; flex-direction: column; }
+  .stat b {
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat span {
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .scope-panel {
+    position: relative;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+  }
+  .scope-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, var(--line-red-soft) 0 1px, transparent 1px 20px),
+      repeating-linear-gradient(90deg, var(--line-red-soft) 0 1px, transparent 1px 20px);
+    opacity: 0.9;
+  }
+  .scope-panel canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .scope-label {
+    position: absolute;
+    top: 0.65rem;
+    left: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .scope-label .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ink-faint);
+  }
+
+  /* ---------- filter bar ---------- */
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    padding: 1rem 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 1.25rem;
+  }
+  .chip-row {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .chip-row::-webkit-scrollbar { display: none; }
+  .chip-btn {
+    flex: none;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-soft);
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .chip-btn svg { width: 0.85rem; height: 0.85rem; }
+  .chip-btn[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .chip-btn.cat[aria-pressed="true"] {
+    background: var(--chip-color, var(--accent));
+    border-color: var(--chip-color, var(--accent));
+    color: #fff;
+  }
+  .search-wrap { margin-left: auto; position: relative; }
+  .search-wrap input {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem 0.45rem 2rem;
+    font-size: 0.85rem;
+    color: var(--ink);
+    width: 15rem;
+    max-width: 100%;
+  }
+  .search-wrap svg {
+    position: absolute;
+    left: 0.65rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.9rem;
+    height: 0.9rem;
+    color: var(--ink-faint);
+  }
+  .results-count {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+    margin: -0.5rem 0 1rem;
+  }
+
+  /* ---------- card grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 1rem;
+    padding-bottom: 3rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.15rem 1rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.5rem;
+    border-radius: 999px;
+  }
+  .chip-cat {
+    color: var(--chip-color);
+    background: color-mix(in srgb, var(--chip-color) 14%, transparent);
+  }
+  .chip-cat svg { width: 0.7rem; height: 0.7rem; }
+  .chip-species {
+    font-family: var(--font-mono);
+    color: var(--ink-faint);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+  }
+  .card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    line-height: 1.25;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .card-sub {
+    margin: -0.35rem 0 0;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+  .card-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 0.15rem;
+  }
+  .play-btn {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: var(--surface);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex: none;
+    transition: transform 0.12s ease, background 0.15s ease;
+  }
+  .play-btn:hover { transform: scale(1.06); }
+  .play-btn svg { width: 1rem; height: 1rem; }
+  .bars {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 14px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .bars.on { opacity: 1; }
+  .bars i {
+    display: block;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 1px;
+    animation: bar 0.9s ease-in-out infinite;
+  }
+  .bars i:nth-child(2) { animation-delay: 0.15s; }
+  .bars i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bar {
+    0%, 100% { height: 4px; }
+    50% { height: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bars i { animation: none; height: 9px; }
+  }
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .duration { font-size: 0.8rem; color: var(--ink-faint); }
+  .grade-badge {
+    margin-left: auto;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    padding: 0.15rem 0.45rem;
+    border-radius: 6px;
+  }
+
+  details.card-details summary {
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--accent-strong);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    user-select: none;
+  }
+  details.card-details summary::-webkit-details-marker { display: none; }
+  details.card-details summary .chev { transition: transform 0.15s ease; }
+  details.card-details[open] summary .chev { transform: rotate(90deg); }
+  .details-body {
+    padding-top: 0.6rem;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .details-body img {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+  .attribution {
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    border-top: 1px dashed var(--line);
+    padding-top: 0.5rem;
+  }
+  .attribution a { color: var(--ink-faint); text-decoration: underline; }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- quiz ---------- */
+  .quiz-shell {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding-bottom: 4rem;
+  }
+  .setup-card, .question-card, .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+  }
+  .setup-card h2, .summary-card h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin: 0 0 0.3rem;
+  }
+  .field-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 1.1rem 0 0.5rem;
+  }
+  .field-label:first-of-type { margin-top: 0.5rem; }
+  .warn {
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    color: var(--bad);
+    background: var(--bad-soft);
+    padding: 0.5rem 0.7rem;
+    border-radius: var(--radius-sm);
+  }
+  .start-btn, .primary-btn {
+    margin-top: 1.5rem;
+    width: 100%;
+    border: none;
+    background: var(--accent);
+    color: var(--surface);
+    font-weight: 600;
+    font-size: 0.98rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .start-btn:not(:disabled):hover, .primary-btn:hover { background: var(--accent-strong); }
+  .ghost-btn {
+    margin-top: 0.6rem;
+    width: 100%;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink-soft);
+    font-weight: 500;
+    font-size: 0.92rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  .quiz-hud {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.9rem;
+  }
+  .progress-track {
+    height: 4px;
+    background: var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 1.1rem;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.25s ease;
+  }
+  .qz-scope {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.9rem;
+  }
+  .qz-visual {
+    position: relative;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .qz-visual canvas { width: 100%; height: 100%; display: block; }
+  .qz-play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+  }
+  .qz-play button {
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: var(--surface);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+  .qz-play svg { width: 1.35rem; height: 1.35rem; }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .option-btn {
+    text-align: left;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.94rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    min-height: 44px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--accent); }
+  .option-btn:disabled { cursor: default; }
+  .option-btn.correct {
+    background: var(--good-soft);
+    border-color: var(--good);
+    color: var(--ink);
+  }
+  .option-btn.incorrect {
+    background: var(--bad-soft);
+    border-color: var(--bad);
+  }
+  .option-mark { font-family: var(--font-mono); font-size: 0.9rem; }
+  .option-mark.correct { color: var(--good); }
+  .option-mark.incorrect { color: var(--bad); }
+
+  .feedback {
+    margin-top: 1.1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+  .feedback .meta-line {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-faint);
+  }
+  .feedback img {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    background: #fff;
+    max-width: 100%;
+  }
+
+  .breakdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.86rem;
+  }
+  .breakdown-table th, .breakdown-table td {
+    text-align: left;
+    padding: 0.4rem 0.3rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .breakdown-table td.num, .breakdown-table th.num { text-align: right; font-family: var(--font-mono); }
+  .score-hero {
+    text-align: center;
+    padding: 1rem 0 0.5rem;
+  }
+  .score-hero b {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 3rem;
+    line-height: 1;
+  }
+  .score-hero span {
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- mini player ---------- */
+  .mini-player {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 50;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.08);
+    transform: translateY(110%);
+    transition: transform 0.28s ease;
+    padding: 0.6rem max(1rem, env(safe-area-inset-left)) calc(0.6rem + env(safe-area-inset-bottom));
+  }
+  .mini-player.show { transform: translateY(0); }
+  .mini-inner {
+    max-width: 74rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .mini-canvas-wrap {
+    width: 3.2rem;
+    height: 2.2rem;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    flex: none;
+  }
+  .mini-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+  .mini-text { min-width: 0; }
+  .mini-text .t1 {
+    font-size: 0.86rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mini-text .t2 {
+    font-size: 0.74rem;
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+  }
+  .mini-play {
+    width: 2.3rem; height: 2.3rem;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: var(--surface);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex: none;
+  }
+  .mini-play svg { width: 0.95rem; height: 0.95rem; }
+  .mini-close {
+    width: 2rem; height: 2rem;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink-faint);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex: none;
+    font-size: 0.9rem;
+  }
+  @media (max-width: 560px) {
+    .mini-text .t2 { display: none; }
+  }
+
+  /* ---------- footer ---------- */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 2rem 0 5rem;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+  }
+  footer a { color: var(--ink-faint); }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  @media (max-width: 560px) {
+    .top-row { flex-wrap: wrap; }
+    .search-wrap { order: 3; width: 100%; margin-left: 0; }
+    .search-wrap input { width: 100%; }
+  }
+</style>
+
+<header class="top">
+  <div class="wrap top-row">
+    <div class="brand">Stethoscape <small>heart&nbsp;sound&nbsp;atlas</small></div>
+    <div class="top-actions">
+      <div class="tabs" role="tablist" aria-label="Mode">
+        <button class="tab" id="tab-browse" role="tab" aria-selected="true" data-mode="browse">Browse</button>
+        <button class="tab" id="tab-quiz" role="tab" aria-selected="false" data-mode="quiz">Quiz</button>
+      </div>
+      <button class="theme-btn" id="theme-toggle" aria-label="Toggle color theme">
+        <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap hero">
+  <div>
+    <h1>A listening atlas of <em>animal heart sounds.</em></h1>
+    <p class="lede">Auscultate real recordings of murmurs, arrhythmias and congenital defects across species, with paired phonograms — then test your ear in Quiz mode.</p>
+    <div class="stat-row">
+      <div class="stat"><b id="stat-total">—</b><span>Recordings</span></div>
+      <div class="stat"><b id="stat-species">—</b><span>Species</span></div>
+      <div class="stat"><b id="stat-categories">—</b><span>Diagnosis groups</span></div>
+    </div>
+  </div>
+  <div class="scope-panel" aria-hidden="true">
+    <div class="scope-grid"></div>
+    <canvas id="hero-canvas"></canvas>
+    <div class="scope-label"><span class="dot"></span> Phonogram — idle</div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="view active" id="view-browse">
+    <div class="filter-bar">
+      <div class="chip-row" id="species-chips"></div>
+      <div class="chip-row" id="category-chips"></div>
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+        <input type="search" id="search-input" placeholder="Search diagnosis, breed…">
+      </div>
+    </div>
+    <p class="results-count" id="results-count"></p>
+    <div class="grid" id="card-grid"></div>
+  </section>
+
+  <section class="view" id="view-quiz">
+    <div class="quiz-shell">
+      <div id="quiz-setup"></div>
+      <div id="quiz-question" style="display:none"></div>
+      <div id="quiz-summary" style="display:none"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <span>© recordings retain original licenses — not relicensed here.</span>
+  <span>Canine set: CC BY-NC-ND 4.0, TiHo Hannover &amp; Vet Budapest.</span>
+  <span>Equine set: CC BY 4.0, Wood, Shapter &amp; Stewart 2024, University of Queensland.</span>
+</footer>
+
+<div class="mini-player" id="mini-player">
+  <div class="mini-inner">
+    <div class="mini-canvas-wrap"><canvas id="mini-canvas"></canvas></div>
+    <div class="mini-text">
+      <div class="t1" id="mini-title">—</div>
+      <div class="t2 mono" id="mini-time">0:00 / 0:00</div>
+    </div>
+    <button class="mini-play" id="mini-play-btn" aria-label="Play/Pause"></button>
+    <button class="mini-close" id="mini-close-btn" aria-label="Stop">✕</button>
+  </div>
+</div>
+
+<audio id="audio-el" preload="none"></audio>
+
+<script>
+const LIBRARY = __LIBRARY_JSON__;
+
+const CATEGORY_META = {
+  normal:       { label: "Normal",           short: "Normal",     color: "var(--cat-normal)",     icon: 'circle' },
+  congenital:   { label: "Congenital",       short: "Congenital", color: "var(--cat-congenital)", icon: 'diamond' },
+  acquired_valvular_disease: { label: "Acquired valvular disease", short: "Valvular", color: "var(--cat-acquired)", icon: 'triangle' },
+  arrhythmia:   { label: "Arrhythmia",       short: "Arrhythmia", color: "var(--cat-arrhythmia)", icon: 'pulse' },
+};
+const SPECIES_META = {
+  dog:   { label: "Canine" },
+  horse: { label: "Equine" },
+};
+
+function catIcon(kind) {
+  const paths = {
+    circle:   '<circle cx="8" cy="8" r="5"/>',
+    diamond:  '<path d="M8 2 L14 8 L8 14 L2 8 Z"/>',
+    triangle: '<path d="M8 2.5 L14 13.5 L2 13.5 Z"/>',
+    pulse:    '<path d="M1 8h4l2-5 2 10 2-5h4"/>',
+  };
+  return `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">${paths[kind]}</svg>`;
+}
+
+function fmtTime(sec) {
+  if (sec == null || isNaN(sec)) return "0:00";
+  sec = Math.max(0, Math.round(sec));
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function sample(arr, n) { return shuffle(arr).slice(0, n); }
+function speciesLabel(a) { return (SPECIES_META[a] && SPECIES_META[a].label) || a; }
+
+/* ================= audio engine ================= */
+const audioEl = document.getElementById("audio-el");
+let audioCtx = null, analyser = null, sourceNode = null;
+let currentRec = null;
+let onPlayStateChange = [];
+
+function ensureGraph() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  sourceNode = audioCtx.createMediaElementSource(audioEl);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 2048;
+  sourceNode.connect(analyser);
+  analyser.connect(audioCtx.destination);
+}
+
+function playRecording(rec) {
+  ensureGraph();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  if (currentRec && currentRec.id === rec.id) {
+    if (audioEl.paused) audioEl.play(); else audioEl.pause();
+    return;
+  }
+  currentRec = rec;
+  audioEl.src = rec.audio;
+  audioEl.play();
+  showMiniPlayer(rec);
+}
+function togglePauseCurrent() {
+  if (!currentRec) return;
+  if (audioEl.paused) audioEl.play(); else audioEl.pause();
+}
+function stopPlayback() {
+  audioEl.pause();
+  audioEl.removeAttribute("src");
+  audioEl.load();
+  currentRec = null;
+  hideMiniPlayer();
+  notifyPlayState();
+}
+function notifyPlayState() { onPlayStateChange.forEach(fn => fn()); }
+audioEl.addEventListener("play", notifyPlayState);
+audioEl.addEventListener("pause", notifyPlayState);
+audioEl.addEventListener("ended", notifyPlayState);
+audioEl.addEventListener("timeupdate", () => {
+  const t = document.getElementById("mini-time");
+  if (t && currentRec) t.textContent = `${fmtTime(audioEl.currentTime)} / ${fmtTime(audioEl.duration || currentRec.duration)}`;
+});
+
+/* ================= visualizers ================= */
+function setupCanvas(canvas) {
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function startIdleScope(canvas) {
+  let ctx = setupCanvas(canvas);
+  window.addEventListener("resize", () => { ctx = setupCanvas(canvas); });
+  const styles = getComputedStyle(document.documentElement);
+  function color(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function draw(t) {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    ctx.clearRect(0, 0, w, h);
+    ctx.beginPath();
+    const phase = REDUCE_MOTION ? 0 : t / 900;
+    for (let x = 0; x <= w; x += 4) {
+      const y = h / 2 + Math.sin(x / 42 + phase) * (h * 0.09) * Math.sin(phase * 0.6 + x / 300);
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = color("--accent");
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    if (!REDUCE_MOTION) requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+}
+
+function startLiveScope(canvas) {
+  let ctx = setupCanvas(canvas);
+  window.addEventListener("resize", () => { ctx = setupCanvas(canvas); });
+  function color(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function draw() {
+    requestAnimationFrame(draw);
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    ctx.clearRect(0, 0, w, h);
+    if (analyser && currentRec && !audioEl.paused) {
+      const data = new Uint8Array(analyser.fftSize);
+      analyser.getByteTimeDomainData(data);
+      ctx.beginPath();
+      const step = Math.max(1, Math.floor(data.length / w));
+      let x = 0;
+      for (let i = 0; i < data.length; i += step) {
+        const v = data[i] / 128 - 1;
+        const y = h / 2 + v * (h / 2) * 0.92;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        x++;
+      }
+      ctx.strokeStyle = color("--accent");
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(0, h / 2);
+      ctx.lineTo(w, h / 2);
+      ctx.strokeStyle = color("--line");
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }
+  requestAnimationFrame(draw);
+}
+
+/* ================= mini player ================= */
+const miniPlayerEl = document.getElementById("mini-player");
+const miniPlayBtn = document.getElementById("mini-play-btn");
+const miniTitle = document.getElementById("mini-title");
+const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+
+function showMiniPlayer(rec) {
+  miniTitle.textContent = `${rec.diagnosis} · ${speciesLabel(rec.animal)}`;
+  miniPlayerEl.classList.add("show");
+}
+function hideMiniPlayer() { miniPlayerEl.classList.remove("show"); }
+miniPlayBtn.addEventListener("click", togglePauseCurrent);
+document.getElementById("mini-close-btn").addEventListener("click", stopPlayback);
+onPlayStateChange.push(() => {
+  miniPlayBtn.innerHTML = (!audioEl.paused) ? ICON_PAUSE : ICON_PLAY;
+  document.querySelectorAll("[data-play-btn]").forEach(btn => {
+    const isThis = currentRec && btn.dataset.playBtn === currentRec.id;
+    const playing = isThis && !audioEl.paused;
+    btn.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+    const bars = btn.closest(".card-controls, .qz-play")?.querySelector(".bars");
+    if (bars) bars.classList.toggle("on", playing);
+  });
+});
+
+/* ================= browse view ================= */
+let filters = { species: "all", categories: new Set(Object.keys(CATEGORY_META)), search: "" };
+
+function buildChips() {
+  const speciesWrap = document.getElementById("species-chips");
+  const speciesList = ["all", ...new Set(LIBRARY.map(r => r.animal))];
+  speciesWrap.innerHTML = speciesList.map(sp => {
+    const label = sp === "all" ? "All species" : speciesLabel(sp);
+    return `<button class="chip-btn" data-species="${sp}" aria-pressed="${filters.species === sp}">${label}</button>`;
+  }).join("");
+  speciesWrap.addEventListener("click", e => {
+    const btn = e.target.closest("[data-species]");
+    if (!btn) return;
+    filters.species = btn.dataset.species;
+    buildChips();
+    renderGrid();
+  });
+
+  const catWrap = document.getElementById("category-chips");
+  const cats = Object.keys(CATEGORY_META);
+  catWrap.innerHTML = cats.map(c => {
+    const meta = CATEGORY_META[c];
+    const pressed = filters.categories.has(c);
+    return `<button class="chip-btn cat" style="--chip-color:${meta.color}" data-cat="${c}" aria-pressed="${pressed}">${catIcon(meta.icon)} ${meta.short}</button>`;
+  }).join("");
+  catWrap.addEventListener("click", e => {
+    const btn = e.target.closest("[data-cat]");
+    if (!btn) return;
+    const c = btn.dataset.cat;
+    if (filters.categories.has(c)) filters.categories.delete(c); else filters.categories.add(c);
+    if (filters.categories.size === 0) filters.categories = new Set(Object.keys(CATEGORY_META));
+    buildChips();
+    renderGrid();
+  });
+}
+
+function matchesFilters(rec) {
+  if (filters.species !== "all" && rec.animal !== filters.species) return false;
+  if (!filters.categories.has(rec.category)) return false;
+  if (filters.search) {
+    const hay = `${rec.diagnosis} ${rec.breed || ""} ${rec.description}`.toLowerCase();
+    if (!hay.includes(filters.search)) return false;
+  }
+  return true;
+}
+
+function cardHTML(rec) {
+  const meta = CATEGORY_META[rec.category];
+  const subBits = [rec.breed, rec.age].filter(Boolean).join(" · ");
+  return `
+  <article class="card" data-id="${rec.id}">
+    <div class="card-head">
+      <span class="chip chip-cat" style="--chip-color:${meta.color}">${catIcon(meta.icon)} ${meta.short}</span>
+      <span class="chip chip-species">${speciesLabel(rec.animal).toUpperCase()}</span>
+    </div>
+    <h3 class="card-title">${rec.diagnosis}</h3>
+    ${subBits ? `<p class="card-sub">${subBits}</p>` : ""}
+    <div class="card-controls">
+      <button class="play-btn" data-play-btn="${rec.id}" aria-label="Play recording">${ICON_PLAY}</button>
+      <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="mono duration">${fmtTime(rec.duration)}</span>
+      ${rec.grade ? `<span class="grade-badge mono">${rec.grade}</span>` : ""}
+    </div>
+    <details class="card-details">
+      <summary><span class="chev">▸</span> Details</summary>
+      <div class="details-body">
+        <p>${rec.description}</p>
+        ${rec.image ? `<img src="${rec.image}" alt="Phonogram waveform for ${rec.diagnosis}" loading="lazy">` : ""}
+        <p class="attribution">${rec.sourceName} — ${rec.sourceLicense}. ${rec.sourceCitation}${rec.sourceUrl ? ` — <a href="${rec.sourceUrl}" target="_blank" rel="noopener">source</a>` : ""}</p>
+      </div>
+    </details>
+  </article>`;
+}
+
+function renderGrid() {
+  const list = LIBRARY.filter(matchesFilters);
+  const grid = document.getElementById("card-grid");
+  document.getElementById("results-count").textContent = `Showing ${list.length} of ${LIBRARY.length} recordings`;
+  grid.innerHTML = list.length
+    ? list.map(cardHTML).join("")
+    : `<div class="empty-state">No recordings match these filters.</div>`;
+}
+document.getElementById("card-grid").addEventListener("click", e => {
+  const btn = e.target.closest("[data-play-btn]");
+  if (!btn) return;
+  const rec = LIBRARY.find(r => r.id === btn.dataset.playBtn);
+  if (rec) playRecording(rec);
+});
+document.getElementById("search-input").addEventListener("input", e => {
+  filters.search = e.target.value.trim().toLowerCase();
+  renderGrid();
+});
+
+/* ================= quiz ================= */
+const quizState = {
+  pool: [], queue: [], index: 0, score: 0, streak: 0, bestStreak: 0,
+  breakdown: {}, answered: false,
+};
+
+function quizSetupHTML() {
+  const cats = Object.keys(CATEGORY_META);
+  return `
+  <div class="setup-card">
+    <h2>Test your ear</h2>
+    <p class="lede" style="margin:0 0 0.5rem;color:var(--ink-soft);max-width:none;">Listen to a recording and pick the diagnosis. Species is shown; the finding is not.</p>
+    <p class="field-label">Species</p>
+    <div class="chip-row" id="qz-species-chips"></div>
+    <p class="field-label">Diagnosis groups</p>
+    <div class="chip-row" id="qz-cat-chips"></div>
+    <p class="field-label">Questions</p>
+    <div class="chip-row" id="qz-count-chips"></div>
+    <div id="qz-warn"></div>
+    <button class="start-btn" id="qz-start">Start quiz</button>
+  </div>`;
+}
+
+let qzFilters = { species: "all", categories: new Set(Object.keys(CATEGORY_META)), count: 10 };
+
+function renderQuizSetup() {
+  document.getElementById("quiz-setup").innerHTML = quizSetupHTML();
+  document.getElementById("quiz-setup").style.display = "block";
+  document.getElementById("quiz-question").style.display = "none";
+  document.getElementById("quiz-summary").style.display = "none";
+
+  const speciesWrap = document.getElementById("qz-species-chips");
+  const speciesList = ["all", ...new Set(LIBRARY.map(r => r.animal))];
+  speciesWrap.innerHTML = speciesList.map(sp => {
+    const label = sp === "all" ? "All species" : speciesLabel(sp);
+    return `<button class="chip-btn" data-qsp="${sp}" aria-pressed="${qzFilters.species === sp}">${label}</button>`;
+  }).join("");
+  speciesWrap.onclick = e => {
+    const btn = e.target.closest("[data-qsp]");
+    if (!btn) return;
+    qzFilters.species = btn.dataset.qsp;
+    renderQuizSetup();
+  };
+
+  const catWrap = document.getElementById("qz-cat-chips");
+  catWrap.innerHTML = Object.keys(CATEGORY_META).map(c => {
+    const meta = CATEGORY_META[c];
+    return `<button class="chip-btn cat" style="--chip-color:${meta.color}" data-qcat="${c}" aria-pressed="${qzFilters.categories.has(c)}">${catIcon(meta.icon)} ${meta.short}</button>`;
+  }).join("");
+  catWrap.onclick = e => {
+    const btn = e.target.closest("[data-qcat]");
+    if (!btn) return;
+    const c = btn.dataset.qcat;
+    if (qzFilters.categories.has(c)) qzFilters.categories.delete(c); else qzFilters.categories.add(c);
+    if (qzFilters.categories.size === 0) qzFilters.categories = new Set(Object.keys(CATEGORY_META));
+    renderQuizSetup();
+  };
+
+  const countWrap = document.getElementById("qz-count-chips");
+  const pool = LIBRARY.filter(r => (qzFilters.species === "all" || r.animal === qzFilters.species) && qzFilters.categories.has(r.category));
+  const options = [5, 10, 20, pool.length];
+  countWrap.innerHTML = [...new Set(options)].filter(n => n > 0).map(n => {
+    const label = n === pool.length ? `All (${n})` : n;
+    return `<button class="chip-btn" data-qcount="${n}" aria-pressed="${qzFilters.count === n}">${label}</button>`;
+  }).join("");
+  countWrap.onclick = e => {
+    const btn = e.target.closest("[data-qcount]");
+    if (!btn) return;
+    qzFilters.count = parseInt(btn.dataset.qcount, 10);
+    renderQuizSetup();
+  };
+
+  const distinctDiagnoses = new Set(pool.map(r => r.diagnosis)).size;
+  const warn = document.getElementById("qz-warn");
+  const startBtn = document.getElementById("qz-start");
+  if (pool.length < 4 || distinctDiagnoses < 4) {
+    warn.innerHTML = `<p class="warn">Need at least 4 distinct diagnoses in scope — widen your filters.</p>`;
+    startBtn.disabled = true;
+  } else {
+    warn.innerHTML = "";
+    startBtn.disabled = false;
+  }
+  startBtn.onclick = startQuiz;
+}
+
+function startQuiz() {
+  const pool = LIBRARY.filter(r => (qzFilters.species === "all" || r.animal === qzFilters.species) && qzFilters.categories.has(r.category));
+  quizState.pool = pool;
+  quizState.queue = sample(pool, Math.min(qzFilters.count, pool.length));
+  quizState.index = 0;
+  quizState.score = 0;
+  quizState.streak = 0;
+  quizState.bestStreak = 0;
+  quizState.breakdown = {};
+  document.getElementById("quiz-setup").style.display = "none";
+  document.getElementById("quiz-summary").style.display = "none";
+  document.getElementById("quiz-question").style.display = "block";
+  renderQuestion();
+}
+
+function buildOptions(correctRec) {
+  const globalPool = LIBRARY;
+  const sameSpeciesOthers = globalPool.filter(r => r.animal === correctRec.animal && r.diagnosis !== correctRec.diagnosis);
+  const distractDiagnoses = new Set();
+  for (const r of shuffle(sameSpeciesOthers)) {
+    if (distractDiagnoses.size >= 3) break;
+    distractDiagnoses.add(r.diagnosis);
+  }
+  if (distractDiagnoses.size < 3) {
+    for (const r of shuffle(globalPool)) {
+      if (distractDiagnoses.size >= 3) break;
+      if (r.diagnosis !== correctRec.diagnosis) distractDiagnoses.add(r.diagnosis);
+    }
+  }
+  const options = shuffle([correctRec.diagnosis, ...distractDiagnoses]);
+  return options;
+}
+
+function renderQuestion() {
+  quizState.answered = false;
+  const rec = quizState.queue[quizState.index];
+  const options = buildOptions(rec);
+  const total = quizState.queue.length;
+  const pct = Math.round(((quizState.index) / total) * 100);
+
+  document.getElementById("quiz-question").innerHTML = `
+    <div class="question-card">
+      <div class="quiz-hud">
+        <span>QUESTION ${quizState.index + 1} / ${total}</span>
+        <span>SCORE ${quizState.score}/${quizState.index} · STREAK ${quizState.streak}</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="qz-scope chip chip-species">${speciesLabel(rec.animal).toUpperCase()}</div>
+      <div class="qz-visual">
+        <canvas id="qz-canvas"></canvas>
+        <div class="qz-play"><button id="qz-play-btn" aria-label="Play recording">${ICON_PLAY}</button></div>
+      </div>
+      <div class="options" id="qz-options">
+        ${options.map(opt => `<button class="option-btn" data-opt="${encodeURIComponent(opt)}">${opt}</button>`).join("")}
+      </div>
+      <div id="qz-feedback"></div>
+    </div>
+  `;
+
+  startLiveScope(document.getElementById("qz-canvas"));
+  const playBtn = document.getElementById("qz-play-btn");
+  playBtn.dataset.playBtn = rec.id;
+  playBtn.addEventListener("click", () => playRecording(rec));
+
+  document.getElementById("qz-options").addEventListener("click", e => {
+    const btn = e.target.closest(".option-btn");
+    if (!btn || quizState.answered) return;
+    answerQuestion(rec, decodeURIComponent(btn.dataset.opt), options);
+  });
+}
+
+function answerQuestion(rec, chosen, options) {
+  quizState.answered = true;
+  const correct = chosen === rec.diagnosis;
+  const cat = rec.category;
+  quizState.breakdown[cat] = quizState.breakdown[cat] || { correct: 0, total: 0 };
+  quizState.breakdown[cat].total++;
+  if (correct) {
+    quizState.score++;
+    quizState.streak++;
+    quizState.bestStreak = Math.max(quizState.bestStreak, quizState.streak);
+    quizState.breakdown[cat].correct++;
+  } else {
+    quizState.streak = 0;
+  }
+
+  document.querySelectorAll("#qz-options .option-btn").forEach(btn => {
+    const val = decodeURIComponent(btn.dataset.opt);
+    btn.disabled = true;
+    if (val === rec.diagnosis) {
+      btn.classList.add("correct");
+      btn.insertAdjacentHTML("beforeend", `<span class="option-mark correct">✓</span>`);
+    } else if (val === chosen) {
+      btn.classList.add("incorrect");
+      btn.insertAdjacentHTML("beforeend", `<span class="option-mark incorrect">✕</span>`);
+    }
+  });
+
+  const meta = CATEGORY_META[rec.category];
+  const subBits = [rec.breed, rec.age, rec.grade].filter(Boolean).join(" · ");
+  document.getElementById("qz-feedback").innerHTML = `
+    <div class="feedback">
+      <div class="meta-line">${meta.label}${subBits ? " · " + subBits : ""} · ${fmtTime(rec.duration)}</div>
+      <p>${rec.description}</p>
+      ${rec.image ? `<img src="${rec.image}" alt="Phonogram waveform">` : ""}
+      <button class="primary-btn" id="qz-next">${quizState.index + 1 < quizState.queue.length ? "Next recording" : "See results"}</button>
+    </div>
+  `;
+  document.getElementById("qz-next").addEventListener("click", () => {
+    quizState.index++;
+    if (quizState.index >= quizState.queue.length) {
+      renderSummary();
+    } else {
+      renderQuestion();
+    }
+  });
+}
+
+function renderSummary() {
+  document.getElementById("quiz-question").style.display = "none";
+  document.getElementById("quiz-summary").style.display = "block";
+  const total = quizState.queue.length;
+  const pct = total ? Math.round((quizState.score / total) * 100) : 0;
+  const rows = Object.entries(quizState.breakdown).map(([cat, v]) => {
+    const meta = CATEGORY_META[cat];
+    return `<tr><td>${meta.label}</td><td class="num mono">${v.correct}/${v.total}</td></tr>`;
+  }).join("");
+  document.getElementById("quiz-summary").innerHTML = `
+    <div class="summary-card">
+      <div class="score-hero">
+        <span>Diagnostic accuracy</span>
+        <b>${pct}%</b>
+        <span class="mono">${quizState.score} / ${total} correct · best streak ${quizState.bestStreak}</span>
+      </div>
+      <table class="breakdown-table">
+        <thead><tr><th>Category</th><th class="num">Score</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <button class="primary-btn" id="qz-again">Play again, same scope</button>
+      <button class="ghost-btn" id="qz-new-scope">Change scope</button>
+    </div>
+  `;
+  document.getElementById("qz-again").addEventListener("click", startQuiz);
+  document.getElementById("qz-new-scope").addEventListener("click", renderQuizSetup);
+}
+
+/* ================= mode + theme wiring ================= */
+function setMode(mode) {
+  document.getElementById("view-browse").classList.toggle("active", mode === "browse");
+  document.getElementById("view-quiz").classList.toggle("active", mode === "quiz");
+  document.getElementById("tab-browse").setAttribute("aria-selected", mode === "browse");
+  document.getElementById("tab-quiz").setAttribute("aria-selected", mode === "quiz");
+}
+document.getElementById("tab-browse").addEventListener("click", () => setMode("browse"));
+document.getElementById("tab-quiz").addEventListener("click", () => setMode("quiz"));
+
+const themeBtn = document.getElementById("theme-toggle");
+themeBtn.addEventListener("click", () => {
+  const current = document.documentElement.dataset.theme ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const next = current === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("stethoscape-theme", next); } catch (e) {}
+});
+
+/* ================= init ================= */
+function init() {
+  document.getElementById("stat-total").textContent = LIBRARY.length;
+  document.getElementById("stat-species").textContent = new Set(LIBRARY.map(r => r.animal)).size;
+  document.getElementById("stat-categories").textContent = new Set(LIBRARY.map(r => r.category)).size;
+  buildChips();
+  renderGrid();
+  renderQuizSetup();
+  startIdleScope(document.getElementById("hero-canvas"));
+  startLiveScope(document.getElementById("mini-canvas"));
+}
+init();
+</script>
