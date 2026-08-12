@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Stethoscape</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="A listening atlas of animal heart sounds — auscultate, compare, and test yourself across species and cardiac diagnoses.">
@@ -63,6 +64,7 @@
     --cat-congenital: #93701f;
     --cat-acquired: #a5552e;
     --cat-arrhythmia: #7a2e3a;
+    --cat-other: #565f8c;
     --shadow: 0 1px 2px rgba(27, 36, 32, 0.07), 0 10px 28px rgba(27, 36, 32, 0.07);
     --radius: 16px;
     --radius-sm: 10px;
@@ -93,6 +95,7 @@
       --cat-congenital: #dcae52;
       --cat-acquired: #dd8459;
       --cat-arrhythmia: #cf8695;
+      --cat-other: #a3aee0;
       --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 14px 34px rgba(0, 0, 0, 0.4);
     }
   }
@@ -117,6 +120,7 @@
     --cat-congenital: #dcae52;
     --cat-acquired: #dd8459;
     --cat-arrhythmia: #cf8695;
+    --cat-other: #a3aee0;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 14px 34px rgba(0, 0, 0, 0.4);
   }
 
@@ -308,6 +312,15 @@
   .scope-label .dot {
     width: 6px; height: 6px; border-radius: 50%;
     background: var(--ink-faint);
+  }
+  .scope-label.is-live { color: var(--accent-strong); }
+  .scope-label.is-live .dot { background: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) {
+    .scope-label.is-live .dot { animation: hero-dot-pulse 1.1s ease-in-out infinite; }
+  }
+  @keyframes hero-dot-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+    50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 0%, transparent); }
   }
 
   /* ---------- filter bar ---------- */
@@ -868,7 +881,7 @@
   <div class="scope-panel" aria-hidden="true">
     <div class="scope-grid"></div>
     <canvas id="hero-canvas"></canvas>
-    <div class="scope-label"><span class="dot"></span> Phonogram — idle</div>
+    <div class="scope-label" id="hero-scope-label"><span class="dot"></span><span class="label-text">Phonogram — idle</span></div>
   </div>
 </div>
 
@@ -899,6 +912,7 @@
   <span>© recordings retain original licenses — not relicensed here.</span>
   <span>Canine set: CC BY-NC-ND 4.0, TiHo Hannover &amp; Vet Budapest.</span>
   <span>Equine set: CC BY 4.0, Wood, Shapter &amp; Stewart 2024, University of Queensland.</span>
+  <span>Clinician's Brief set: © Educational Concepts, LLC — all rights reserved, not openly licensed.</span>
 </footer>
 
 <div class="mini-player" id="mini-player">
@@ -923,9 +937,11 @@ const CATEGORY_META = {
   congenital:   { label: "Congenital",       short: "Congenital", color: "var(--cat-congenital)", icon: 'diamond' },
   acquired_valvular_disease: { label: "Acquired valvular disease", short: "Valvular", color: "var(--cat-acquired)", icon: 'triangle' },
   arrhythmia:   { label: "Arrhythmia",       short: "Arrhythmia", color: "var(--cat-arrhythmia)", icon: 'pulse' },
+  other:        { label: "Other",            short: "Other",      color: "var(--cat-other)",      icon: 'diamond' },
 };
 const SPECIES_META = {
   dog:   { label: "Canine" },
+  cat:   { label: "Feline" },
   horse: { label: "Equine" },
 };
 
@@ -1018,26 +1034,52 @@ function setupCanvas(canvas) {
 }
 const REDUCE_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function startIdleScope(canvas) {
+function startHeroScope(canvas) {
+  const label = document.getElementById("hero-scope-label");
+  const labelText = label ? label.querySelector(".label-text") : null;
   let ctx = setupCanvas(canvas);
   window.addEventListener("resize", () => { ctx = setupCanvas(canvas); });
-  const styles = getComputedStyle(document.documentElement);
   function color(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  let running = false;
   function draw(t) {
+    const live = !!(analyser && currentRec && !audioEl.paused);
     const w = canvas.clientWidth, h = canvas.clientHeight;
     ctx.clearRect(0, 0, w, h);
     ctx.beginPath();
-    const phase = REDUCE_MOTION ? 0 : t / 900;
-    for (let x = 0; x <= w; x += 4) {
-      const y = h / 2 + Math.sin(x / 42 + phase) * (h * 0.09) * Math.sin(phase * 0.6 + x / 300);
-      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    if (live) {
+      const data = new Uint8Array(analyser.fftSize);
+      analyser.getByteTimeDomainData(data);
+      const step = Math.max(1, Math.floor(data.length / w));
+      let x = 0;
+      for (let i = 0; i < data.length; i += step) {
+        const v = data[i] / 128 - 1;
+        const y = h / 2 + v * (h / 2) * 0.92;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        x++;
+      }
+    } else {
+      const phase = REDUCE_MOTION ? 0 : (t || 0) / 900;
+      for (let x = 0; x <= w; x += 4) {
+        const y = h / 2 + Math.sin(x / 42 + phase) * (h * 0.09) * Math.sin(phase * 0.6 + x / 300);
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
     }
     ctx.strokeStyle = color("--accent");
     ctx.lineWidth = 2;
     ctx.stroke();
-    if (!REDUCE_MOTION) requestAnimationFrame(draw);
+    if (label) label.classList.toggle("is-live", live);
+    if (labelText) labelText.textContent = live ? "Phonogram — live" : "Phonogram — idle";
+    if (live || !REDUCE_MOTION) {
+      requestAnimationFrame(draw);
+    } else {
+      running = false;
+    }
   }
-  requestAnimationFrame(draw);
+  function kick() {
+    if (!running) { running = true; requestAnimationFrame(draw); }
+  }
+  onPlayStateChange.push(kick);
+  kick();
 }
 
 function startLiveScope(canvas) {
@@ -1279,6 +1321,7 @@ function renderQuizSetup() {
 }
 
 function startQuiz() {
+  stopPlayback();
   const pool = LIBRARY.filter(r => (qzFilters.species === "all" || r.animal === qzFilters.species) && qzFilters.categories.has(r.category));
   quizState.pool = pool;
   quizState.queue = sample(pool, Math.min(qzFilters.count, pool.length));
@@ -1387,6 +1430,7 @@ function answerQuestion(rec, chosen, options) {
     </div>
   `;
   document.getElementById("qz-next").addEventListener("click", () => {
+    stopPlayback();
     quizState.index++;
     if (quizState.index >= quizState.queue.length) {
       renderSummary();
@@ -1451,7 +1495,7 @@ function init() {
   buildChips();
   renderGrid();
   renderQuizSetup();
-  startIdleScope(document.getElementById("hero-canvas"));
+  startHeroScope(document.getElementById("hero-canvas"));
   startLiveScope(document.getElementById("mini-canvas"));
 }
 init();
