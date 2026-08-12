@@ -1,9 +1,16 @@
-# Normal — Heart Sound Recordings (7)
+# Normal — Heart Sound Recordings (14)
 
 | Recording | Animal | Diagnosis | Grade | Breed | Source | Audio | Image | Duration |
 |---|---|---|---|---|---|---|---|---|
+| cb-feline-physiologic-murmur | cat | Feline Physiologic Murmur | 2/6 |  | cliniciansbrief | [feline-physiologic-murmur.mp3](../../sources/cliniciansbrief/audio/normal/feline-physiologic-murmur.mp3) |  | 8.1s |
+| cb-normal-6-year-old-domestic-shorthair-cat | cat | Normal 6-year-old Domestic Shorthair Cat |  | domestic | cliniciansbrief | [normal-6-year-old-domestic-shorthair-cat.mp3](../../sources/cliniciansbrief/audio/normal/normal-6-year-old-domestic-shorthair-cat.mp3) |  | 12.2s |
+| cb-normal-doberman-pinscher | dog | Normal Doberman Pinscher |  |  | cliniciansbrief | [normal-doberman-pinscher.mp3](../../sources/cliniciansbrief/audio/normal/normal-doberman-pinscher.mp3) |  | 4.5s |
+| cb-normal-labrador-retriever | dog | Normal Labrador Retriever |  | Labrador | cliniciansbrief | [normal-labrador-retriever.mp3](../../sources/cliniciansbrief/audio/normal/normal-labrador-retriever.mp3) |  | 7.1s |
+| cb-normal-panting-golden-retriever | dog | Normal Panting Golden Retriever |  |  | cliniciansbrief | [normal-panting-golden-retriever.mp3](../../sources/cliniciansbrief/audio/normal/normal-panting-golden-retriever.mp3) |  | 5.3s |
+| cb-physiologic-murmur | dog | Physiologic Murmur |  |  | cliniciansbrief | [physiologic-murmur.mp3](../../sources/cliniciansbrief/audio/normal/physiologic-murmur.mp3) |  | 8.1s |
 | tiho-normal-rhythm | dog | Normal cardiac rhythm (no murmur) | 0/6 | Beagle | tiho-hannover | [normal_cardiac_rhythm.mp3](../../sources/tiho-hannover/audio/examples/normal_cardiac_rhythm.mp3) |  | 19.5s |
 | tiho-normal-rhythm-video | dog | Normal cardiac rhythm (video/DPCG) | 0/6 | Beagle | tiho-hannover | [normal_cardiac_rhythm.mpg](../../sources/tiho-hannover/audio/examples/normal_cardiac_rhythm.mpg) |  |  |
+| cb-normal-equine-s3-sounds | horse | Normal Equine S3 Sounds |  |  | cliniciansbrief | [normal-equine-s3-sounds.mp3](../../sources/cliniciansbrief/audio/normal/normal-equine-s3-sounds.mp3) |  | 16.3s |
 | uq-eq-normal-aortic | horse | Normal heart sounds (aortic valve) |  | unspecified | uq-equine-auscultation | [aortic_valve_normal.wav](../../sources/uq-equine-auscultation/audio/normal/aortic_valve_normal.wav) | [phonogram](../../sources/uq-equine-auscultation/images/normal/aortic_valve_normal_phonogram.png) | 15.0s |
 | uq-eq-normal-mitral | horse | Normal heart sounds (mitral valve) |  | unspecified | uq-equine-auscultation | [mitral_valve_normal.wav](../../sources/uq-equine-auscultation/audio/normal/mitral_valve_normal.wav) | [phonogram](../../sources/uq-equine-auscultation/images/normal/mitral_valve_normal_phonogram.png) | 15.0s |
 | uq-eq-normal-s3-gallop | horse | Physiologic S3 gallop sound (mitral valve) |  | unspecified | uq-equine-auscultation | [mitral_valve_s3_gallop.wav](../../sources/uq-equine-auscultation/audio/normal/mitral_valve_s3_gallop.wav) | [phonogram](../../sources/uq-equine-auscultation/images/normal/mitral_valve_s3_gallop_phonogram.png) | 15.0s |

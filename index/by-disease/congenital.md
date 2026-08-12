@@ -1,7 +1,18 @@
-# Congenital — Heart Sound Recordings (11)
+# Congenital — Heart Sound Recordings (22)
 
 | Recording | Animal | Diagnosis | Grade | Breed | Source | Audio | Image | Duration |
 |---|---|---|---|---|---|---|---|---|
+| cb-mild-pulmonary-stenosis-severe-pulmonary-insufficiency | dog | Mild Pulmonary Stenosis with Severe Pulmonary Insufficiency | 3/6 |  | cliniciansbrief | [mild-pulmonary-stenosis-severe-pulmonary-insufficiency.mp3](../../sources/cliniciansbrief/audio/congenital/mild-pulmonary-stenosis-severe-pulmonary-insufficiency.mp3) |  | 8.1s |
+| cb-moderate-subaortic-stenosis | dog | Moderate Subaortic Stenosis | 4/6 |  | cliniciansbrief | [moderate-subaortic-stenosis.mp3](../../sources/cliniciansbrief/audio/congenital/moderate-subaortic-stenosis.mp3) |  | 18.5s |
+| cb-patent-ductus-arteriosus | dog | Patent Ductus Arteriosus |  |  | cliniciansbrief | [patent-ductus-arteriosus.mp3](../../sources/cliniciansbrief/audio/congenital/patent-ductus-arteriosus.mp3) |  | 7.7s |
+| cb-patent-ductus-arteriosus-atrial-fibrillation | dog | Patent Ductus Arteriosus with Atrial Fibrillation |  |  | cliniciansbrief | [patent-ductus-arteriosus-atrial-fibrillation.mp3](../../sources/cliniciansbrief/audio/congenital/patent-ductus-arteriosus-atrial-fibrillation.mp3) |  | 4.8s |
+| cb-pulmonic-stenosis-moderate | dog | Pulmonic Stenosis (Moderate) | 3-4/6 |  | cliniciansbrief | [pulmonic-stenosis-moderate.mp3](../../sources/cliniciansbrief/audio/congenital/pulmonic-stenosis-moderate.mp3) |  | 7.8s |
+| cb-pulmonic-stenosis-opening-snap | dog | Pulmonic Stenosis with Opening Snap |  |  | cliniciansbrief | [pulmonic-stenosis-opening-snap.mp3](../../sources/cliniciansbrief/audio/congenital/pulmonic-stenosis-opening-snap.mp3) |  | 5.5s |
+| cb-pulmonic-stenosis-pulmonary-insufficiency | dog | Pulmonic Stenosis with Pulmonary Insufficiency | 4/6 |  | cliniciansbrief | [pulmonic-stenosis-pulmonary-insufficiency.mp3](../../sources/cliniciansbrief/audio/congenital/pulmonic-stenosis-pulmonary-insufficiency.mp3) |  | 3.6s |
+| cb-pulmonic-stenosis-severe | dog | Pulmonic Stenosis (Severe) | 3-4/6 |  | cliniciansbrief | [pulmonic-stenosis-severe.mp3](../../sources/cliniciansbrief/audio/congenital/pulmonic-stenosis-severe.mp3) |  | 8.1s |
+| cb-severe-subaortic-stenosis-mild-aortic-insufficiency | dog | Severe Subaortic Stenosis & Mild Aortic Insufficiency | 4/6 |  | cliniciansbrief | [severe-subaortic-stenosis-mild-aortic-insufficiency.mp3](../../sources/cliniciansbrief/audio/congenital/severe-subaortic-stenosis-mild-aortic-insufficiency.mp3) |  | 8.1s |
+| cb-valvular-aortic-stenosis-and-aortic-insufficiency | dog | Valvular Aortic Stenosis and Aortic Insufficiency | 4/6 | boxer | cliniciansbrief | [valvular-aortic-stenosis-and-aortic-insufficiency.mp3](../../sources/cliniciansbrief/audio/congenital/valvular-aortic-stenosis-and-aortic-insufficiency.mp3) |  | 6.4s |
+| cb-ventricular-septal-defect | dog | Ventricular Septal Defect | 4/6 |  | cliniciansbrief | [ventricular-septal-defect.mp3](../../sources/cliniciansbrief/audio/congenital/ventricular-septal-defect.mp3) |  | 4.8s |
 | tiho-ex-004-ps-moderate | dog | Moderate pulmonic stenosis | 3/6 | Basset Hound | tiho-hannover | [004_basset_hound_moderate_pulmonic_stenosis_grade3.mp3](../../sources/tiho-hannover/audio/examples/004_basset_hound_moderate_pulmonic_stenosis_grade3.mp3) |  | 15.2s |
 | tiho-ex-005-ps-severe | dog | Severe pulmonic stenosis | 5/6 | Fox Terrier | tiho-hannover | [005_fox_terrier_severe_pulmonic_stenosis_grade5.mp3](../../sources/tiho-hannover/audio/examples/005_fox_terrier_severe_pulmonic_stenosis_grade5.mp3) |  | 16.8s |
 | tiho-ex-006-sas-severe | dog | Severe subvalvular aortic stenosis (SAS) | 4/6 | Fox Terrier | tiho-hannover | [006_fox_terrier_severe_subaortic_stenosis_grade4.mp3](../../sources/tiho-hannover/audio/examples/006_fox_terrier_severe_subaortic_stenosis_grade4.mp3) |  | 30.7s |

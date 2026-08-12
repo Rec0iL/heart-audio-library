@@ -64,6 +64,7 @@ Every recording (transcoded to a small mono MP3) and every phonogram image is em
 - `congenital` — congenital defects (PDA, VSD, pulmonic/subaortic stenosis, etc.)
 - `acquired_valvular_disease` — degenerative/acquired valve disease (e.g. myxomatous mitral valve disease)
 - `arrhythmia` — rate/rhythm disturbances (bradycardia, tachycardia, AV block, fibrillation, extrasystoles)
+- `other` — named sound phenomena that aren't a specific lesion/rhythm (gallop sounds, systolic click, split S2, pericardial friction rub, HCM with dynamic outflow obstruction); introduced by the `cliniciansbrief` source
 
 ## Current sources
 
@@ -71,8 +72,9 @@ Every recording (transcoded to a small mono MP3) and every phonogram image is em
 |---|---|---|---|
 | [tiho-hannover](sources/tiho-hannover/ATTRIBUTION.md) | Dog | 32 | CC BY-NC-ND 4.0 |
 | [uq-equine-auscultation](sources/uq-equine-auscultation/ATTRIBUTION.md) | Horse | 16 (each with a paired phonogram image) | CC BY 4.0 |
+| [cliniciansbrief](sources/cliniciansbrief/ATTRIBUTION.md) | Dog, Cat, Horse | 54 | ⚠️ **No open license** — all rights reserved, personal/educational reference use only (see ATTRIBUTION.md) |
 
-See `catalog/catalog.csv` for the full per-recording index (48 recordings total).
+See `catalog/catalog.csv` for the full per-recording index (102 recordings total).
 
 ## On expanding further
 
@@ -81,3 +83,5 @@ A broad search (vet schools, Merck Vet Manual, Zenodo, Figshare, Dryad, Kaggle, 
 ## Licensing note
 
 Every source folder carries its own `ATTRIBUTION.md`. Several CC variants restrict commercial use (NC) and/or derivative works (ND) — check the specific source's license before any reuse beyond personal study/teaching. This repository does not relicense or waive any original license terms.
+
+**`cliniciansbrief` is an exception to the "openly-licensed sources only" rule above** — it was added at the repository owner's explicit request despite having no open license (see [sources/cliniciansbrief/ATTRIBUTION.md](sources/cliniciansbrief/ATTRIBUTION.md)). Treat it as all-rights-reserved, personal/educational reference use only; do not redistribute or publish it beyond that without permission from Clinician's Brief / Educational Concepts, LLC. If this repo is ever published somewhere the owner doesn't control access to (e.g. a public GitHub Pages site), reconsider whether this source folder — and its embedding into `index.html` — belongs there.
