@@ -614,6 +614,31 @@
     border-radius: var(--radius-sm);
     cursor: pointer;
   }
+  .card-decision {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1.1rem;
+  }
+  .decision-btn {
+    flex: 1;
+    border: none;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.15s ease;
+  }
+  .decision-btn:hover { transform: translateY(-1px); }
+  .decision-btn.again {
+    background: var(--bad-soft);
+    color: var(--bad);
+    border: 1px solid var(--bad);
+  }
+  .decision-btn.good {
+    background: var(--good);
+    color: #fff;
+  }
 
   .quiz-hud {
     display: flex;
@@ -860,6 +885,7 @@
       <div class="tabs" role="tablist" aria-label="Mode">
         <button class="tab" id="tab-browse" role="tab" aria-selected="true" data-mode="browse">Browse</button>
         <button class="tab" id="tab-quiz" role="tab" aria-selected="false" data-mode="quiz">Quiz</button>
+        <button class="tab" id="tab-cards" role="tab" aria-selected="false" data-mode="cards">Cards</button>
       </div>
       <button class="theme-btn" id="theme-toggle" aria-label="Toggle color theme">
         <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
@@ -871,7 +897,7 @@
 <div class="wrap hero">
   <div>
     <h1>A listening atlas of <em>animal heart sounds.</em></h1>
-    <p class="lede">Auscultate real recordings of murmurs, arrhythmias and congenital defects across species, with paired phonograms — then test your ear in Quiz mode.</p>
+    <p class="lede">Auscultate real recordings of murmurs, arrhythmias and congenital defects across species, with paired phonograms — then test your ear in Quiz mode, or drill diagnoses like flashcards in Cards.</p>
     <div class="stat-row">
       <div class="stat"><b id="stat-total">—</b><span>Recordings</span></div>
       <div class="stat"><b id="stat-species">—</b><span>Species</span></div>
@@ -904,6 +930,14 @@
       <div id="quiz-setup"></div>
       <div id="quiz-question" style="display:none"></div>
       <div id="quiz-summary" style="display:none"></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-cards">
+    <div class="quiz-shell">
+      <div id="cards-setup"></div>
+      <div id="cards-deck" style="display:none"></div>
+      <div id="cards-summary" style="display:none"></div>
     </div>
   </section>
 </main>
@@ -1152,13 +1186,13 @@ function buildChips() {
     const label = sp === "all" ? "All species" : speciesLabel(sp);
     return `<button class="chip-btn" data-species="${sp}" aria-pressed="${filters.species === sp}">${label}</button>`;
   }).join("");
-  speciesWrap.addEventListener("click", e => {
+  speciesWrap.onclick = e => {
     const btn = e.target.closest("[data-species]");
     if (!btn) return;
     filters.species = btn.dataset.species;
     buildChips();
     renderGrid();
-  });
+  };
 
   const catWrap = document.getElementById("category-chips");
   const cats = Object.keys(CATEGORY_META);
@@ -1167,7 +1201,7 @@ function buildChips() {
     const pressed = filters.categories.has(c);
     return `<button class="chip-btn cat" style="--chip-color:${meta.color}" data-cat="${c}" aria-pressed="${pressed}">${catIcon(meta.icon)} ${meta.short}</button>`;
   }).join("");
-  catWrap.addEventListener("click", e => {
+  catWrap.onclick = e => {
     const btn = e.target.closest("[data-cat]");
     if (!btn) return;
     const c = btn.dataset.cat;
@@ -1175,7 +1209,7 @@ function buildChips() {
     if (filters.categories.size === 0) filters.categories = new Set(Object.keys(CATEGORY_META));
     buildChips();
     renderGrid();
-  });
+  };
 }
 
 function matchesFilters(rec) {
@@ -1468,15 +1502,207 @@ function renderSummary() {
   document.getElementById("qz-new-scope").addEventListener("click", renderQuizSetup);
 }
 
+/* ================= cards (flashcard drill) ================= */
+const cardsState = {
+  pool: [], queue: [], totalUnique: 0, mastered: 0, attempts: 0,
+  missedIds: new Set(), breakdown: {}, current: null, revealed: false,
+};
+let cdFilters = { species: "all", categories: new Set(Object.keys(CATEGORY_META)) };
+
+function cardsSetupHTML() {
+  return `
+  <div class="setup-card">
+    <h2>Drill the diagnoses</h2>
+    <p class="lede" style="margin:0 0 0.5rem;color:var(--ink-soft);max-width:none;">Listen, guess the diagnosis, then flip the card to check yourself. Cards you miss come back around until you know them.</p>
+    <p class="field-label">Species</p>
+    <div class="chip-row" id="cd-species-chips"></div>
+    <p class="field-label">Diagnosis groups</p>
+    <div class="chip-row" id="cd-cat-chips"></div>
+    <div id="cd-warn"></div>
+    <button class="start-btn" id="cd-start">Start deck</button>
+  </div>`;
+}
+
+function renderCardsSetup() {
+  document.getElementById("cards-setup").innerHTML = cardsSetupHTML();
+  document.getElementById("cards-setup").style.display = "block";
+  document.getElementById("cards-deck").style.display = "none";
+  document.getElementById("cards-summary").style.display = "none";
+
+  const speciesWrap = document.getElementById("cd-species-chips");
+  const speciesList = ["all", ...new Set(LIBRARY.map(r => r.animal))];
+  speciesWrap.innerHTML = speciesList.map(sp => {
+    const label = sp === "all" ? "All species" : speciesLabel(sp);
+    return `<button class="chip-btn" data-csp="${sp}" aria-pressed="${cdFilters.species === sp}">${label}</button>`;
+  }).join("");
+  speciesWrap.onclick = e => {
+    const btn = e.target.closest("[data-csp]");
+    if (!btn) return;
+    cdFilters.species = btn.dataset.csp;
+    renderCardsSetup();
+  };
+
+  const catWrap = document.getElementById("cd-cat-chips");
+  catWrap.innerHTML = Object.keys(CATEGORY_META).map(c => {
+    const meta = CATEGORY_META[c];
+    return `<button class="chip-btn cat" style="--chip-color:${meta.color}" data-ccat="${c}" aria-pressed="${cdFilters.categories.has(c)}">${catIcon(meta.icon)} ${meta.short}</button>`;
+  }).join("");
+  catWrap.onclick = e => {
+    const btn = e.target.closest("[data-ccat]");
+    if (!btn) return;
+    const c = btn.dataset.ccat;
+    if (cdFilters.categories.has(c)) cdFilters.categories.delete(c); else cdFilters.categories.add(c);
+    if (cdFilters.categories.size === 0) cdFilters.categories = new Set(Object.keys(CATEGORY_META));
+    renderCardsSetup();
+  };
+
+  const pool = LIBRARY.filter(r => (cdFilters.species === "all" || r.animal === cdFilters.species) && cdFilters.categories.has(r.category));
+  const warn = document.getElementById("cd-warn");
+  const startBtn = document.getElementById("cd-start");
+  if (pool.length < 1) {
+    warn.innerHTML = `<p class="warn">No recordings match — widen your filters.</p>`;
+    startBtn.disabled = true;
+  } else {
+    warn.innerHTML = "";
+    startBtn.disabled = false;
+  }
+  startBtn.onclick = startCards;
+}
+
+function startCards() {
+  stopPlayback();
+  const pool = LIBRARY.filter(r => (cdFilters.species === "all" || r.animal === cdFilters.species) && cdFilters.categories.has(r.category));
+  cardsState.pool = pool;
+  cardsState.queue = shuffle(pool);
+  cardsState.totalUnique = pool.length;
+  cardsState.mastered = 0;
+  cardsState.attempts = 0;
+  cardsState.missedIds = new Set();
+  cardsState.breakdown = {};
+  document.getElementById("cards-setup").style.display = "none";
+  document.getElementById("cards-summary").style.display = "none";
+  document.getElementById("cards-deck").style.display = "block";
+  nextCard();
+}
+
+function nextCard() {
+  if (cardsState.queue.length === 0) { renderCardsSummary(); return; }
+  cardsState.current = cardsState.queue.shift();
+  cardsState.revealed = false;
+  renderCardFront();
+}
+
+function renderCardFront() {
+  const rec = cardsState.current;
+  const remaining = cardsState.queue.length + 1;
+  const pct = cardsState.totalUnique ? Math.round((cardsState.mastered / cardsState.totalUnique) * 100) : 0;
+  document.getElementById("cards-deck").innerHTML = `
+    <div class="question-card">
+      <div class="quiz-hud">
+        <span>REMAINING ${remaining}</span>
+        <span>KNOWN ${cardsState.mastered}/${cardsState.totalUnique} · REVIEWS ${cardsState.attempts}</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="qz-scope chip chip-species">${speciesLabel(rec.animal).toUpperCase()}</div>
+      <div class="qz-visual">
+        <canvas id="cd-canvas"></canvas>
+        <div class="qz-play"><button id="cd-play-btn" aria-label="Play recording">${ICON_PLAY}</button></div>
+      </div>
+      <button class="ghost-btn" id="cd-reveal">Reveal diagnosis</button>
+      <div id="cd-back"></div>
+    </div>
+  `;
+
+  startLiveScope(document.getElementById("cd-canvas"));
+  const playBtn = document.getElementById("cd-play-btn");
+  playBtn.dataset.playBtn = rec.id;
+  playBtn.addEventListener("click", () => playRecording(rec));
+  document.getElementById("cd-reveal").addEventListener("click", revealCard);
+}
+
+function revealCard() {
+  if (cardsState.revealed) return;
+  cardsState.revealed = true;
+  const rec = cardsState.current;
+  document.getElementById("cd-reveal").style.display = "none";
+  const meta = CATEGORY_META[rec.category];
+  const subBits = [rec.breed, rec.age, rec.grade].filter(Boolean).join(" · ");
+  document.getElementById("cd-back").innerHTML = `
+    <div class="feedback" style="margin-top:1.1rem;padding-top:1rem;">
+      <h3 class="card-title" style="margin:0 0 0.2rem;">${rec.diagnosis}</h3>
+      <div class="meta-line">${meta.label}${subBits ? " · " + subBits : ""} · ${fmtTime(rec.duration)}</div>
+      <p>${rec.description}</p>
+      ${rec.image ? `<img src="${rec.image}" alt="Phonogram waveform">` : ""}
+    </div>
+    <div class="card-decision">
+      <button class="decision-btn again" id="cd-again">Still learning</button>
+      <button class="decision-btn good" id="cd-good">Got it</button>
+    </div>
+  `;
+  document.getElementById("cd-again").addEventListener("click", () => decideCard(false));
+  document.getElementById("cd-good").addEventListener("click", () => decideCard(true));
+}
+
+function decideCard(knewIt) {
+  const rec = cardsState.current;
+  cardsState.attempts++;
+  const cat = rec.category;
+  cardsState.breakdown[cat] = cardsState.breakdown[cat] || { correct: 0, total: 0 };
+  const firstPass = !cardsState.missedIds.has(rec.id);
+  if (knewIt) {
+    cardsState.mastered++;
+    if (firstPass) cardsState.breakdown[cat].correct++;
+  } else {
+    cardsState.missedIds.add(rec.id);
+    const pos = Math.min(cardsState.queue.length, 3);
+    cardsState.queue.splice(pos, 0, rec);
+  }
+  if (firstPass) cardsState.breakdown[cat].total++;
+  stopPlayback();
+  nextCard();
+}
+
+function renderCardsSummary() {
+  document.getElementById("cards-deck").style.display = "none";
+  document.getElementById("cards-summary").style.display = "block";
+  const total = cardsState.totalUnique;
+  const known = total - cardsState.missedIds.size;
+  const pct = total ? Math.round((known / total) * 100) : 0;
+  const rows = Object.entries(cardsState.breakdown).map(([cat, v]) => {
+    const meta = CATEGORY_META[cat];
+    return `<tr><td>${meta.label}</td><td class="num mono">${v.correct}/${v.total}</td></tr>`;
+  }).join("");
+  document.getElementById("cards-summary").innerHTML = `
+    <div class="summary-card">
+      <div class="score-hero">
+        <span>Known on first look</span>
+        <b>${pct}%</b>
+        <span class="mono">${known} / ${total} · ${cardsState.attempts} reviews total</span>
+      </div>
+      <table class="breakdown-table">
+        <thead><tr><th>Category</th><th class="num">First-look score</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <button class="primary-btn" id="cd-again-deck">Play again, same scope</button>
+      <button class="ghost-btn" id="cd-new-scope">Change scope</button>
+    </div>
+  `;
+  document.getElementById("cd-again-deck").addEventListener("click", startCards);
+  document.getElementById("cd-new-scope").addEventListener("click", renderCardsSetup);
+}
+
 /* ================= mode + theme wiring ================= */
 function setMode(mode) {
   document.getElementById("view-browse").classList.toggle("active", mode === "browse");
   document.getElementById("view-quiz").classList.toggle("active", mode === "quiz");
+  document.getElementById("view-cards").classList.toggle("active", mode === "cards");
   document.getElementById("tab-browse").setAttribute("aria-selected", mode === "browse");
   document.getElementById("tab-quiz").setAttribute("aria-selected", mode === "quiz");
+  document.getElementById("tab-cards").setAttribute("aria-selected", mode === "cards");
 }
 document.getElementById("tab-browse").addEventListener("click", () => setMode("browse"));
 document.getElementById("tab-quiz").addEventListener("click", () => setMode("quiz"));
+document.getElementById("tab-cards").addEventListener("click", () => setMode("cards"));
 
 const themeBtn = document.getElementById("theme-toggle");
 themeBtn.addEventListener("click", () => {
@@ -1495,6 +1721,7 @@ function init() {
   buildChips();
   renderGrid();
   renderQuizSetup();
+  renderCardsSetup();
   startHeroScope(document.getElementById("hero-canvas"));
   startLiveScope(document.getElementById("mini-canvas"));
 }

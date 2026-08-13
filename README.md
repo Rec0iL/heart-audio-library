@@ -1,6 +1,6 @@
 # Heart Audio Library
 
-An organized, locally-hosted archive of openly-licensed animal (mainly companion animal) heart sound recordings, grouped by species and cardiac diagnosis, for veterinary auscultation education and research. Includes **Stethoscape**, a self-contained web player and ear-training quiz — see [Stethoscape player](#stethoscape-player-quiz) below.
+An organized, locally-hosted archive of openly-licensed animal (mainly companion animal) heart sound recordings, grouped by species and cardiac diagnosis, for veterinary auscultation education and research. Includes **Stethoscape**, a self-contained web player, flashcard drill, and ear-training quiz — see [Stethoscape player](#stethoscape-player--quiz) below, or try it live at **https://rec0il.github.io/heart-audio-library/**.
 
 ## Structure
 
@@ -37,10 +37,11 @@ HeartAudioLibrary/
 
 ## Stethoscape player & quiz
 
-`index.html` is **Stethoscape** — a single, fully self-contained web app (no build step, no external requests, no CDN) with two modes:
+`index.html` is **Stethoscape** — a single, fully self-contained web app (no build step, no external requests, no CDN) with three modes. Try it live at **https://rec0il.github.io/heart-audio-library/**, or run it locally as described below.
 
 - **Browse** — filter by species and diagnosis category, search, play any recording, and expand a card for its full description, paired phonogram image, and attribution.
 - **Quiz** — pick a scope (species / diagnosis groups / question count), listen, and pick the correct diagnosis from 4 options; get instant feedback with the phonogram and a score/streak readout, then a per-category accuracy breakdown at the end.
+- **Cards** — vocabulary-style flashcard drill: pick a scope, listen to a recording, then reveal the diagnosis and mark yourself "Got it" or "Still learning." Missed cards get reshuffled back into the deck so you keep seeing them until you know them; the deck ends with a first-look accuracy breakdown per category.
 
 Every recording (transcoded to a small mono MP3) and every phonogram image is embedded directly in the file as base64 — that's why it's ~9.5 MB. This is deliberate: it means the exact same file works with **zero configuration** in three places:
 
